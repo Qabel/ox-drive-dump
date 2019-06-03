@@ -2,7 +2,7 @@ import argparse
 import itertools
 
 import mysql.connector
-from anytree import Node
+from anytree import Node, RenderTree, render
 
 
 def connect(host, user, password, port, database):
@@ -46,7 +46,7 @@ def main():
     args = parse_args()
     db = connect(args.host, args.user, args.password, args.port, args.db)
     root = build_tree(db)
-    print(root)
+    print(RenderTree(root, style=render.ContStyle))
 
 
 if __name__ == '__main__':
