@@ -1,4 +1,6 @@
 import argparse
+import shutil
+from os import makedirs
 from os import path
 
 import mysql.connector
@@ -17,6 +19,8 @@ def parse_args():
     parser.add_argument('--password', dest='password')
     parser.add_argument('--port', dest='port', default='3306')
     parser.add_argument('--db', dest='db')
+    parser.add_argument('SOURCE', help='Source folder that contains the "hashed" folder')
+    parser.add_argument('TARGET', help='Target folder to copy the files to')
 
     return parser.parse_args()
 
@@ -67,7 +71,7 @@ def build_nodes(rows):
 
 
 def build_tree(folder_rows, file_rows):
-    root = Node(name='', fname='/', id=0, parent_id=-1)
+    root = Node(name='', fname='', id=0, parent_id=-1)
     node_by_id = {node.id: node for node in build_nodes(folder_rows)}
     node_by_id[0] = root
     files_itr = build_file_nodes(file_rows)
@@ -87,8 +91,16 @@ def main():
     paths = []
     for node in LevelOrderIter(root):
         if hasattr(node, 'location'):
-            paths.append((path.join(*(n.fname for n in node.path)), node.location))
-    print(paths)
+            paths.append((path.join(*(n.fname for n in node.path[:-1])), node.fname, node.location))
+
+    source_root = args.SOURCE
+    target_root = args.TARGET
+    for folder, filename, source in paths:
+        target_folder = path.join(target_root, folder)
+        target_file = path.join(target_folder, filename)
+        source_path = path.join(source_root, source)
+        makedirs(target_folder, exist_ok=True)
+        shutil.copy(source_path, target_file)
 
 
 if __name__ == '__main__':
