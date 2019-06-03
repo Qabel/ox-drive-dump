@@ -1,7 +1,8 @@
 import argparse
+from os import path
 
 import mysql.connector
-from anytree import Node, RenderTree, render
+from anytree import Node, LevelOrderIter
 
 
 def connect(host, user, password, port, database):
@@ -54,18 +55,19 @@ WHERE t.row_num = 1
 
 def build_file_nodes(rows):
     return (Node(name=filename,
+                 fname=filename,
                  location=file_store_location,
                  folder_id=folder_id)
             for filename, file_store_location, folder_id in rows)
 
 
 def build_nodes(rows):
-    return (Node(id=id, name=fname, parent_id=parent_id)
+    return (Node(id=id, name=fname, fname=fname, parent_id=parent_id)
                 for id, parent_id, fname in rows)
 
 
 def build_tree(folder_rows, file_rows):
-    root = Node(name='', id=0, parent_id=-1)
+    root = Node(name='', fname='/', id=0, parent_id=-1)
     node_by_id = {node.id: node for node in build_nodes(folder_rows)}
     node_by_id[0] = root
     files_itr = build_file_nodes(file_rows)
@@ -82,7 +84,11 @@ def main():
     args = parse_args()
     db = connect(args.host, args.user, args.password, args.port, args.db)
     root = build_tree(list(query_folders(db)), query_files(db))
-    print(RenderTree(root, style=render.ContStyle))
+    paths = []
+    for node in LevelOrderIter(root):
+        if hasattr(node, 'location'):
+            paths.append((path.join(*(n.fname for n in node.path)), node.location))
+    print(paths)
 
 
 if __name__ == '__main__':
