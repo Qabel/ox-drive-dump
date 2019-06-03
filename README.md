@@ -1,7 +1,6 @@
 ## Requirements
 
 * Python 3.7 (3.6 probably works, too)
-* python-mysqldb
 
 ## Install
 
