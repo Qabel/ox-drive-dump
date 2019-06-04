@@ -7,6 +7,10 @@ The program scrapes the database and builds the file tree, then copies the files
 from the `hashed` directory of ox drive to the target directory into the correct
 folder structure.
 
+Duplicate files are renamed to `*.dup` and this may lead to filenames like
+`./infostore/Deleted files/.DS_Store.dup.dup.dup.dup`.
+
+
 ## Requirements
 
 * Python 3.7 (3.6 probably works, too)

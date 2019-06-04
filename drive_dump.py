@@ -122,11 +122,21 @@ def main():
         'hardlink': 'Hard linking files'
     }[args.action]
     with click.progressbar(paths, label=label) as path_itr:
+        files = set()
+        duplicates = set()
         for folder, filename, source in path_itr:
             target_folder = os.path.join(target_root, folder)
             target_file = os.path.join(target_folder, filename)
             source_path = os.path.join(source_root, source)
+            while target_file in files:
+                target_file = target_file + ".dup"
+                duplicates.add(target_file)
+            files.add(target_file)
             operation(source_path, target_file, target_folder)
+    if duplicates:
+        print("Found duplicate files:")
+        for dup in sorted(duplicates):
+            print(dup)
 
 
 if __name__ == '__main__':
