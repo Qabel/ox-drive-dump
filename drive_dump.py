@@ -17,8 +17,8 @@ def connect(host, user, password, port, database):
 def parse_args():
     parser = argparse.ArgumentParser(description='Dump the ox drive')
     parser.add_argument('--host', dest='host', default='localhost')
-    parser.add_argument('--user', dest='user')
-    parser.add_argument('--password', dest='password')
+    parser.add_argument('--user', dest='user', default='root')
+    parser.add_argument('--password', dest='password', default=None)
     parser.add_argument('--port', dest='port', default='3306')
     parser.add_argument('--db', dest='db')
     parser.add_argument('--action', choices=['fake', 'hardlink', 'copy'], default='fake')
